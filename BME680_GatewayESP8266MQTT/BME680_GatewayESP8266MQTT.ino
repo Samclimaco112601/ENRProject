@@ -6,8 +6,8 @@
 #define MY_BAUD_RATE 9600
 
 // Enables and select radio type (if attached)
-//#define MY_RADIO_RF24
-//#define MY_RF24_CE_PIN 2
+#define MY_RADIO_RF24
+#define MY_RF24_CE_PIN 2 // 2 = D4 on ESP8266
 
 
 #define MY_GATEWAY_MQTT_CLIENT
@@ -122,6 +122,9 @@ void loop()
   Serial.println(" %");
   send(humidityMSG.set(bme.humidity, 1));
   Serial.println();
+  
+
+
   delay(2000);
 }
 
