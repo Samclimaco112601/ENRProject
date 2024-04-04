@@ -1,3 +1,14 @@
+//Code for the ESP8266, includes BME680 sensor and PM2.5 Air sensor
+
+#include <MySensors.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
+#include "Adafruit_PM25AQI.h"
+#include <RH_NRF24.h>
+#include <EEPROM.h>
+#include <ESP8266WiFi.h>
 
 // Enable debug prints to serial monitor
 #define MY_DEBUG
@@ -61,17 +72,6 @@
 #define CHILD_ID_DUST_PM25 6   //2.5 um
 #define CHILD_ID_DUST_PM50 7   //5.0 um
 #define CHILD_ID_DUST_PM100 8  //10.0 um
-
-
-#include <MySensors.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <Adafruit_Sensor.h>
-#include "Adafruit_BME680.h"
-#include "Adafruit_PM25AQI.h"
-#include <RH_NRF24.h>
-#include <EEPROM.h>
-#include <ESP8266WiFi.h>
 
 //create BME sensor
 Adafruit_BME680 bme;  // I2C
