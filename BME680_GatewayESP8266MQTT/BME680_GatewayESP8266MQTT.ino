@@ -1,15 +1,5 @@
 //Code for the ESP8266, includes BME680 sensor and PM2.5 Air sensor
 
-#include <MySensors.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <Adafruit_Sensor.h>
-#include "Adafruit_BME680.h"
-#include "Adafruit_PM25AQI.h"
-#include <RH_NRF24.h>
-#include <EEPROM.h>
-#include <ESP8266WiFi.h>
-
 // Enable debug prints to serial monitor
 #define MY_DEBUG
 
@@ -50,14 +40,14 @@
 //#define MY_IP_ADDRESS 192,168,178,87
 
 // If using static ip you can define Gateway and Subnet address as well
-//#define MY_IP_GATEWAY_ADDRESS 192,168,178,1
-//#define MY_IP_SUBNET_ADDRESS 255,255,255,0
+// #define MY_IP_GATEWAY_ADDRESS 192,168,178,1
+// #define MY_IP_SUBNET_ADDRESS 255,255,255,0
 
 // MQTT broker ip address.
-//#define MY_CONTROLLER_IP_ADDRESS 192, 168, 1, 6
+// #define MY_CONTROLLER_IP_ADDRESS 192, 168, 1, 2
 
-//MQTT broker if using URL instead of ip address.
-//#define MY_CONTROLLER_URL_ADDRESS "ecuador.mynetgear.com"
+// MQTT broker if using URL instead of ip address.
+// #define MY_CONTROLLER_URL_ADDRESS "ecuador.mynetgear.com"
 #define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
 
 // The MQTT broker port to to open
@@ -72,6 +62,17 @@
 #define CHILD_ID_DUST_PM25 6   //2.5 um
 #define CHILD_ID_DUST_PM50 7   //5.0 um
 #define CHILD_ID_DUST_PM100 8  //10.0 um
+
+// Libraries
+#include <MySensors.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
+#include "Adafruit_PM25AQI.h"
+#include <RH_NRF24.h>
+#include <EEPROM.h>
+#include <ESP8266WiFi.h>
 
 //create BME sensor
 Adafruit_BME680 bme;  // I2C
@@ -174,24 +175,7 @@ void loop() {
   }
   Serial.println("AQI reading success");
 
-  Serial.println();
-  Serial.println(F("---------------------------------------"));
-  Serial.println(F("Concentration Units (standard)"));
-  Serial.println(F("---------------------------------------"));
-  Serial.print(F("PM 1.0: "));
-  Serial.print(data.pm10_standard);
-  Serial.print(F("\t\tPM 2.5: "));
-  Serial.print(data.pm25_standard);
-  Serial.print(F("\t\tPM 10: "));
-  Serial.println(data.pm100_standard);
-  Serial.println(F("Concentration Units (environmental)"));
-  Serial.println(F("---------------------------------------"));
-  Serial.print(F("PM 1.0: "));
-  Serial.print(data.pm10_env);
-  Serial.print(F("\t\tPM 2.5: "));
-  Serial.print(data.pm25_env);
-  Serial.print(F("\t\tPM 10: "));
-  Serial.println(data.pm100_env);
+
   Serial.println(F("---------------------------------------"));
   Serial.print(F("Particles > 0.3um / 0.1L air:"));
   Serial.println(data.particles_03um);
@@ -213,5 +197,5 @@ void loop() {
   send(msgDust100.set(float(data.particles_100um), 1));
   Serial.println(F("---------------------------------------"));
 
-  delay(2000);
+  delay(5000);
 }

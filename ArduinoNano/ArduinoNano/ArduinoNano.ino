@@ -1,8 +1,5 @@
 //Code including rain gauge sensor and radio communication
 
-#include <MySensors.h>
-#include <RH_NRF24.h>
-
 // Enable debug prints to serial monitor
 #define MY_DEBUG
 
@@ -16,24 +13,30 @@
 // power your radio separately with a good regulator you can turn up PA level.
 #define MY_RF24_PA_LEVEL RF24_PA_LOW
 
-// Enable repeater functionality for this node
-#define MY_REPEATER_FEATURE
+#define ACTUATOR_ID 0
 
+#define MY_SIGNING_SOFT
+//#define MY_SIGNING_ATSHA204
+#define MY_DEBUG_VERBOSE_SIGNING
 
 // Set this node's subscribe and publish topic prefix
-#define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway7-out"
-#define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "mygateway7-in"
+// #define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway7-out"
+// #define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "mygateway7-in"
 
 // Set MQTT client id
-#define MY_MQTT_CLIENT_ID "mysensors-7"
+// #define MY_MQTT_CLIENT_ID "mysensors-7"
 
-#define MY_WIFI_SSID "NETGEAR13"
-#define MY_WIFI_PASSWORD "smilingcoconut656"
+// #define MY_WIFI_SSID "NETGEAR13"
+// #define MY_WIFI_PASSWORD "smilingcoconut656"
 
-#define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
+// #define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
 
 // The MQTT broker port to to open
-#define MY_PORT 1883
+// #define MY_PORT 1883
+
+// Libraries
+#include <MySensors.h>
+#include <RH_NRF24.h>
 
 #define RAIN_RATE_CHILD_ID 0
 
