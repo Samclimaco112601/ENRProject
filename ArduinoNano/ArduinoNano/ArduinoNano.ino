@@ -8,10 +8,11 @@
 
 // Enables and select radio type (if attached)
 #define MY_RADIO_RF24
+//#define MY_RF24_CE_PIN 2 // D2 pin
 
 // Set LOW transmit power level as default, if you have an amplified NRF-module and
 // power your radio separately with a good regulator you can turn up PA level.
-#define MY_RF24_PA_LEVEL RF24_PA_LOW
+#define MY_RF24_PA_LEVEL RF24_PA_HIGH
 
 #define ACTUATOR_ID 0
 
@@ -44,8 +45,8 @@
 MyMessage rainMSG(RAIN_RATE_CHILD_ID, V_RAINRATE);
 
 //Pin and intterupt
-byte sensorPin = 2;
-byte sensorInterrupt = 0;
+byte sensorPin = 3;
+byte sensorInterrupt = 1;
 
 float calibrationFactor = 6.0;  // sensor outputs approximately 6.0 pulses per second per litre/minute of flow.
 float sampleRate = 1000;        //miliiseconds

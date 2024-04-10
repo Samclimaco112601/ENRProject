@@ -129,19 +129,19 @@ void setup() {
 
 void presentation() {
   sendSketchInfo("Aerosol and Weather Sensor Combined", "2.3.2");
-  
+
   present(CHILD_ID_DUST_PM3, S_DUST);
-  send(msgDust3b.set("um/.1L"));  
+  send(msgDust3b.set("um/.1L"));
   present(CHILD_ID_DUST_PM5, S_DUST);
   send(msgDust5b.set("um/.1L"));
   present(CHILD_ID_DUST_PM10, S_DUST);
-  send(msgDust10b.set("um/.1L")); 
+  send(msgDust10b.set("um/.1L"));
   present(CHILD_ID_DUST_PM25, S_DUST);
-  send(msgDust25b.set("um/.1L"));  
+  send(msgDust25b.set("um/.1L"));
   present(CHILD_ID_DUST_PM50, S_DUST);
   send(msgDust50b.set("um/.1L"));
   present(CHILD_ID_DUST_PM100, S_DUST);
-  send(msgDust100b.set("um/.1L")); 
+  send(msgDust100b.set("um/.1L"));
   present(TEMP_CHILD_ID, S_TEMP);
   present(HUM_CHILD_ID, S_HUM);
   present(BARO_CHILD_ID, S_BARO);
@@ -157,9 +157,9 @@ void loop() {
   Serial.println(" *F");
   send(temperatureMSG.set((bme.temperature), 1));
   Serial.print("Pressure = ");
-  Serial.print(bme.pressure / 3386);
+  Serial.print(float(bme.pressure) / 3386.0);
   Serial.println(" in. Hg");
-  send(pressureMSG.set((bme.pressure / 3386), 1));
+  send(pressureMSG.set((float(bme.pressure) / 3386.0), 1));
   Serial.print("Humidity = ");
   Serial.print(bme.humidity);
   Serial.println(" %");
