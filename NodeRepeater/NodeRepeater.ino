@@ -17,25 +17,6 @@
 // Enabled repeater feature for this node
 #define MY_REPEATER_FEATURE
 
-//#define MY_SIGNING_SOFT
-//#define MY_SIGNING_ATSHA204
-//#define MY_DEBUG_VERBOSE_SIGNING
-
-// Set this node's subscribe and publish topic prefix
-// #define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway7-out"
-// #define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "mygateway7-in"
-
-// Set MQTT client id
-// #define MY_MQTT_CLIENT_ID "mysensors-7"
-
-// #define MY_WIFI_SSID "NETGEAR13"
-// #define MY_WIFI_PASSWORD "smilingcoconut656"
-
-// #define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
-
-// The MQTT broker port to to open
-// #define MY_PORT 1883
-
 // Libraries
 #include <MySensors.h>
 #include <RH_NRF24.h>
