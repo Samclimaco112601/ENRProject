@@ -15,11 +15,11 @@
 #define MY_GATEWAY_ESP8266
 
 // Set this node's subscribe and publish topic prefix
-#define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway6-out"
-#define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "mygateway6-in"
+#define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway3-out"
+#define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "mygateway3-in"
 
 // Set MQTT client id
-#define MY_MQTT_CLIENT_ID "mysensors-6"
+#define MY_MQTT_CLIENT_ID "mysensors-3"
 
 // Enable these if your MQTT broker requires username/password
 //#define MY_MQTT_USER "username"
