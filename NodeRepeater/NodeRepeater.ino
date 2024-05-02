@@ -20,11 +20,19 @@
 // Libraries
 #include <MySensors.h>
 #include <RH_NRF24.h>
+#include <Adafruit_MPU6050.h>
 
 #define RAIN_RATE_CHILD_ID 0
+#define MOVEMENT_CHILD_ID 1
 
 //create mysensors varibles, send as V_custom not as a JSON
 MyMessage rainMSG(RAIN_RATE_CHILD_ID, V_RAINRATE);
+MyMessage moveMSG(MOVEMENT_CHILD_ID, V_STATUS);
+
+// Gyroscope setup
+Adafruit_MPU6050 mpu;
+Adafruit_Sensor *mpu_gyro;
+float rotationDetection = .2; //In rad/second
 
 //Pin and intterupt
 byte sensorPin = 5;
@@ -43,8 +51,21 @@ void setup() {
   // Initialize a serial connection for reporting values to the host
   Serial.begin(9600);
 
+  while (!Serial)
+    delay(10);
+
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+  }
+
   pinMode(sensorPin, INPUT);
   digitalWrite(sensorPin, HIGH);
+
+    	// set gyro range to +- 500 deg/s
+	mpu.setGyroRange(MPU6050_RANGE_250_DEG);
+
+	// set filter bandwidth to 21 Hz
+	mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
   pulseCount = 0;
   flowRate = 5.0;
@@ -60,8 +81,9 @@ void setup() {
 }
 
 void presentation() {
-  sendSketchInfo("Rainfall Sensor", "2.3.2");
+  sendSketchInfo("Rainfall+Movement Sensor", "2.3.2");
   present(RAIN_RATE_CHILD_ID, S_RAIN);
+  present(MOVEMENT_CHILD_ID, S_BINARY);
 }
 
 void loop() {
@@ -115,6 +137,19 @@ void loop() {
   if (millis() - lastSent > 5000) {  //if time is greater than 5s
     lastSent = millis();
     send(rainMSG.set(flowRate, 1));
+  }
+
+  sensors_event_t gyro;
+  mpu_gyro->getEvent(&gyro);
+
+  /* Landlslide detection based on rotation*/
+  float totalRotation = sqrt(gyro.gyro.x*gyro.gyro.x + gyro.gyro.y*gyro.gyro.y + gyro.gyro.z*gyro.gyro.z);
+
+  if(totalRotation > rotationDetection){
+    Serial.println("Movement Detected\n");
+    send(moveMSG.set(float(1), 1));
+  } else{
+    send(moveMSG.set(float(0), 1));
   }
 }
 
