@@ -123,7 +123,7 @@ void loop() {
   Serial.print("Pressure = ");
   Serial.print(float(bme.pressure) / 3386.0);
   Serial.println(" in. Hg");
-  send(pressureMSG.set((float(bme.pressure) / 3386.0), 1));
+  send(pressureMSG.set((float(bme.pressure) / 3386.0), 2));
   Serial.print("Humidity = ");
   Serial.print(bme.humidity);
   Serial.println(" %");

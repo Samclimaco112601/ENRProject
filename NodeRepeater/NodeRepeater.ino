@@ -27,16 +27,15 @@
 
 //create mysensors varibles, send as V_custom not as a JSON
 MyMessage rainMSG(RAIN_RATE_CHILD_ID, V_RAINRATE);
-MyMessage moveMSG(MOVEMENT_CHILD_ID, V_STATUS);
+MyMessage moveMSG(MOVEMENT_CHILD_ID, V_TRIPPED);
 
 // Gyroscope setup
 Adafruit_MPU6050 mpu;
-Adafruit_Sensor *mpu_gyro;
-float rotationDetection = .2; //In rad/second
+float rotationDetection = .5; //In rad/second
 
 //Pin and intterupt
-byte sensorPin = 5;
-byte sensorInterrupt = 2;
+//byte sensorPin = 5;
+//byte sensorInterrupt = 2;
 
 float calibrationFactor = 6.0;  // sensor outputs approximately 6.0 pulses per second per litre/minute of flow.
 float sampleRate = 1000;        //miliiseconds
@@ -59,14 +58,8 @@ void setup() {
     Serial.println("Failed to find MPU6050 chip");
   }
 
-  pinMode(sensorPin, INPUT);
-  digitalWrite(sensorPin, HIGH);
-
-    	// set gyro range to +- 500 deg/s
-	mpu.setGyroRange(MPU6050_RANGE_250_DEG);
-
-	// set filter bandwidth to 21 Hz
-	mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+  //pinMode(sensorPin, INPUT);
+  //digitalWrite(sensorPin, HIGH);
 
   pulseCount = 0;
   flowRate = 5.0;
@@ -138,23 +131,34 @@ void loop() {
 //   }
   if (millis() - lastSent > 5000) {  //if time is greater than 5s
     lastSent = millis();
-    send(rainMSG.set(flowRate, 1));
+    send(rainMSG.set(flowRate, 2));
   }
 
-  sensors_event_t gyro;
-  mpu_gyro->getEvent(&gyro);
+  sensors_event_t accel, gyro, temp;
+  mpu.getEvent(&accel, &gyro, &temp);
+
+  /* Display the results (rotation is measured in rad/s) */
+  Serial.print("\t\tGyro X: ");
+  Serial.print(gyro.gyro.x);
+  Serial.print(" \tY: ");
+  Serial.print(gyro.gyro.y);
+  Serial.print(" \tZ: ");
+  Serial.print(gyro.gyro.z);
+  Serial.println(" radians/s\n");
 
   /* Landlslide detection based on rotation*/
   float totalRotation = sqrt(gyro.gyro.x*gyro.gyro.x + gyro.gyro.y*gyro.gyro.y + gyro.gyro.z*gyro.gyro.z);
 
   if(totalRotation > rotationDetection){
     Serial.println("Movement Detected\n");
-    send(moveMSG.set(float(1), 1));
+    send(moveMSG.set(true));
+    moveMSG.send
     lastSentMovement = millis();
-  } else if(millis() - lastSentMovement > 60000){
-    send(moveMSG.set(float(0), 1));
+  } else if(millis() - lastSentMovement > 1000){ // if movement has not been detected for 20s
+    moveMSG.set(false);
     lastSentMovement = millis();
   }
+  
 }
 
 // /*
