@@ -161,5 +161,5 @@ void loop() {
   send(msgDust100.set(float(data.particles_100um), 1));
   Serial.println(F("---------------------------------------"));
 
-  delay(5000);
+  wait(10000);
 }
