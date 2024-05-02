@@ -170,7 +170,7 @@ void loop() {
   PM25_AQI_Data data;
   if (!aqi.read(&data)) {
     Serial.println("Could not read from AQI");
-    delay(500);  // try again in a bit!
+    wait(500);  // try again in a bit!
     return;
   }
   Serial.println("AQI reading success");
@@ -197,5 +197,5 @@ void loop() {
   send(msgDust100.set(float(data.particles_100um), 1));
   Serial.println(F("---------------------------------------"));
 
-  delay(5000);
+  wait(20000);
 }
