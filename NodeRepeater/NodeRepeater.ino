@@ -46,6 +46,7 @@ unsigned int flowMilliLitres;
 unsigned long totalMilliLitres;
 unsigned long oldTime;
 unsigned long lastSent;
+unsigned long lastSentMovement;
 
 void setup() {
   // Initialize a serial connection for reporting values to the host
@@ -73,6 +74,7 @@ void setup() {
   totalMilliLitres = 0;
   oldTime = 0;
   lastSent = 0;
+  lastSentMovement = 0;
 
   // The Hall-effect sensor is connected to pin 2 which uses interrupt 0.
   // Configured to trigger on a FALLING state change (transition from HIGH
@@ -148,8 +150,10 @@ void loop() {
   if(totalRotation > rotationDetection){
     Serial.println("Movement Detected\n");
     send(moveMSG.set(float(1), 1));
-  } else{
+    lastSentMovement = millis();
+  } else if(millis() - lastSentMovement > 60000){
     send(moveMSG.set(float(0), 1));
+    lastSentMovement = millis();
   }
 }
 
