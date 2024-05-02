@@ -19,7 +19,6 @@
 
 // Libraries
 #include <MySensors.h>
-#include <RH_NRF24.h>
 #include <Adafruit_MPU6050.h>
 
 #define RAIN_RATE_CHILD_ID 0
@@ -152,10 +151,9 @@ void loop() {
   if(totalRotation > rotationDetection){
     Serial.println("Movement Detected\n");
     send(moveMSG.set(true));
-    moveMSG.send
     lastSentMovement = millis();
   } else if(millis() - lastSentMovement > 1000){ // if movement has not been detected for 20s
-    moveMSG.set(false);
+    send(moveMSG.set(false));
     lastSentMovement = millis();
   }
   
