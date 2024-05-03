@@ -1,4 +1,4 @@
-//Code including rain gauge sensor and radio communication
+//Code including rain gauge sensor, gyroscope, and radio communication
 
 // Enable debug prints to serial monitor
 #define MY_DEBUG
@@ -8,7 +8,7 @@
 
 // Enables and select radio type (if attached)
 #define MY_RADIO_RF24
-#define MY_RF24_CE_PIN 2 // D4 pin
+#define MY_RF24_CE_PIN 2  // D4 pin
 
 // Set LOW transmit power level as default, if you have an amplified NRF-module and
 // power your radio separately with a good regulator you can turn up PA level.
@@ -21,30 +21,29 @@
 #include <MySensors.h>
 #include <Adafruit_MPU6050.h>
 
-#define RAIN_RATE_CHILD_ID 0
-#define MOVEMENT_CHILD_ID 1
+#define RAIN_CHILD_ID 0
+#define RAIN_RATE_CHILD_ID 1
+#define MOVEMENT_CHILD_ID 2
 
-//create mysensors varibles, send as V_custom not as a JSON
-MyMessage rainMSG(RAIN_RATE_CHILD_ID, V_RAINRATE);
+//create mysensors varibles, send as V_custom
+MyMessage rainMSG(RAIN_CHILD_ID, V_RAIN);
+MyMessage rainRateMSG(RAIN_RATE_CHILD_ID, V_RAINRATE);
 MyMessage moveMSG(MOVEMENT_CHILD_ID, V_TRIPPED);
 
-// Gyroscope setup
+// Gyroscope attributes
 Adafruit_MPU6050 mpu;
-float rotationDetection = .5; //In rad/second
+float rotationDetection = .5;  //In rad/second
+unsigned long lastSentMovementTime = 0;
 
-//Pin and intterupt
-//byte sensorPin = 5;
-//byte sensorInterrupt = 2;
-
-float calibrationFactor = 6.0;  // sensor outputs approximately 6.0 pulses per second per litre/minute of flow.
-float sampleRate = 1000;        //miliiseconds
-volatile byte pulseCount;
-float flowRate;
-unsigned int flowMilliLitres;
-unsigned long totalMilliLitres;
-unsigned long oldTime;
-unsigned long lastSent;
-unsigned long lastSentMovement;
+// Rain gauge attributes and intialization
+#define rainGaugePin 0          // D3 pin for the ESP8266 controller
+float calibrationFactor = 6.0;  // The flow sensor outputs approximately 6.0 pulses/second per L/min
+float flowRate = 0;
+volatile byte pulseCount = 0;
+unsigned int flowMilliLitres = 0;
+unsigned long totalMilliLitres = 0;
+unsigned long lastRainRateTime = 0;
+unsigned long lastDay = 0;
 
 void setup() {
   // Initialize a serial connection for reporting values to the host
@@ -53,116 +52,90 @@ void setup() {
   while (!Serial)
     delay(10);
 
-  if (!mpu.begin()) {
+  while (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
+    delay(100);
   }
 
-  //pinMode(sensorPin, INPUT);
-  //digitalWrite(sensorPin, HIGH);
+  //Rain Gauge setup and initialization
+  pinMode(rainGaugePin, INPUT);
+  digitalWrite(rainGaugePin, HIGH);
 
   pulseCount = 0;
   flowRate = 5.0;
   flowMilliLitres = 0;
   totalMilliLitres = 0;
-  oldTime = 0;
-  lastSent = 0;
-  lastSentMovement = 0;
+  lastRainRateTime = 0;
+  lastSentMovementTime = 0;
 
-  // The Hall-effect sensor is connected to pin 2 which uses interrupt 0.
-  // Configured to trigger on a FALLING state change (transition from HIGH
-  // state to LOW state)
-  //attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
+  // Configured to trigger on a FALLING state change
+  attachInterrupt(rainGaugePin, pulseCounter, FALLING);
 }
+
 
 void presentation() {
   sendSketchInfo("Rainfall+Movement Sensor", "2.3.2");
   present(RAIN_RATE_CHILD_ID, S_RAIN);
+  present(RAIN_RATE_CHILD_ID, S_RAIN);
   present(MOVEMENT_CHILD_ID, S_BINARY);
 }
 
+
 void loop() {
+  if (abs(millis() - lastRainRateTime) > 1000) {  // Only process counters once per second
 
-//   if ((millis() - oldTime) > sampleRate)  // Only process counters once per second
-//   {
-//     // Disable the interrupt while calculating flow rate and sending the value to
-//     // the host
-//     detachInterrupt(sensorInterrupt);
+    // Disable the interrupt while calculating flow rate
+    detachInterrupt(rainGaugePin);
 
-//     // Because this loop may not complete in exactly 1 second intervals we calculate
-//     // the number of milliseconds that have passed since the last execution and use
-//     // that to scale the output. We also apply the calibrationFactor to scale the output
-//     // based on the number of pulses per second per units of measure (litres/minute in
-//     // this case) coming from the sensor.
-//     flowRate = ((sampleRate / (millis() - oldTime)) * pulseCount) / calibrationFactor;
+    // We also apply the calibrationFactor to scale the output
+    // based on the number of pulses per second per units of measure (litres/minute in
+    // this case) coming from the sensor.
+    flowRate = ((1000.0 / (millis() - lastRainRateTime)) * pulseCount) / calibrationFactor;
 
-//     // Note the time this processing pass was executed. Note that because we've
-//     // disabled interrupts the millis() function won't actually be incrementing right
-//     // at this point, but it will still return the value it was set to just before
-//     // interrupts went away.
-//     oldTime = millis();
+    lastRainRateTime = millis();
 
-//     // Divide the flow rate in litres/minute by 60 to determine how many litres have
-//     // passed through the sensor in this 1 second interval, then multiply by 1000 to
-//     // convert to millilitres.
-//     flowMilliLitres = (flowRate / 60) * 1000;
+    // Calculates the total water in mL
+    flowMilliLitres = (flowRate / 60) * 1000;
 
-//     // Add the millilitres passed in this second to the cumulative total
-//     totalMilliLitres += flowMilliLitres;
+    // Add the millilitres passed in this second to the cumulative total
+    totalMilliLitres += flowMilliLitres;
 
-//     unsigned int frac;
+    // Sends the flow rate to MyController server
+    send(rainRateMSG.set(flowRate, 1));
+    send(rainMSG.set(float(totalMilliLitres), 0));
 
-//     // Print the flow rate for this second in litres / minute
-//     Serial.print("Flow rate: ");
-//     Serial.print(flowRate);  // Print the integer part of the variable
-//     Serial.print("L/min");
-//     Serial.print("\t");  // Print tab space
+    // Reset the pulse counter so we can start incrementing again
+    pulseCount = 0;
 
-//     // Print the cumulative total of litres flowed since starting
-//     Serial.print("Output Liquid Quantity: ");
-//     Serial.print(totalMilliLitres);
-//     Serial.println("mL");
-
-//     // Reset the pulse counter so we can start incrementing again
-//     pulseCount = 0;
-
-//     // Enable the interrupt again now that we've finished sending output
-//     attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
-//   }
-  if (millis() - lastSent > 5000) {  //if time is greater than 5s
-    lastSent = millis();
-    send(rainMSG.set(flowRate, 2));
+    // Enable the interrupt again now that we've finished sending output
+    attachInterrupt(digitalPinToInterrupt(rainGaugePin), pulseCounter, FALLING);
   }
 
+  // if a day has past
+  if (millis() - lastDay > 86400000) { 
+    flowMilliLitres = 0; //reset rain total
+  }
+
+  // Get Gyroscope values
   sensors_event_t accel, gyro, temp;
   mpu.getEvent(&accel, &gyro, &temp);
 
-  /* Display the results (rotation is measured in rad/s) */
-  Serial.print("\t\tGyro X: ");
-  Serial.print(gyro.gyro.x);
-  Serial.print(" \tY: ");
-  Serial.print(gyro.gyro.y);
-  Serial.print(" \tZ: ");
-  Serial.print(gyro.gyro.z);
-  Serial.println(" radians/s\n");
-
   /* Landlslide detection based on rotation*/
-  float totalRotation = sqrt(gyro.gyro.x*gyro.gyro.x + gyro.gyro.y*gyro.gyro.y + gyro.gyro.z*gyro.gyro.z);
+  float totalRotation = sqrt(gyro.gyro.x * gyro.gyro.x + gyro.gyro.y * gyro.gyro.y + gyro.gyro.z * gyro.gyro.z);
 
-  if(totalRotation > rotationDetection){
+  // If movement has been detected
+  if (totalRotation > rotationDetection) {
     Serial.println("Movement Detected\n");
     send(moveMSG.set(true));
-    lastSentMovement = millis();
-  } else if(millis() - lastSentMovement > 1000){ // if movement has not been detected for 20s
+    lastSentMovementTime = millis();
+  } else if (abs(millis() - lastSentMovementTime) > 3000) {  // if movement has not been detected for 3s
     send(moveMSG.set(false));
-    lastSentMovement = millis();
+    lastSentMovementTime = millis();
   }
-  
 }
 
-// /*
 // Interrupt Service Routine
-//  */
-// void pulseCounter() {
-//   // Increment the pulse counter
-//   pulseCount++;
-// }
+ICACHE_RAM_ATTR void pulseCounter() {
+  // Increment the pulse counter
+  pulseCount++;
+}

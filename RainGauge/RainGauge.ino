@@ -4,16 +4,14 @@ Liquid flow rate sensor -DIYhacking.com Arvind Sanjeev
 Measure the liquid/water flow rate using this code. 
 Connect Vcc and Gnd of sensor to arduino, and the 
 signal line to arduino digital pin 2.
- 
  */
 
 
-byte sensorInterrupt = 0;
-byte sensorPin = 2;
+#define rainGaugePin 0
 
-// The hall-effect flow sensor outputs approximately 4.5 pulses per second per
+// The hall-effect flow sensor outputs approximately 6.0 pulses per second per
 // litre/minute of flow.
-float calibrationFactor = 4.5;
+float calibrationFactor = 6.0;
 
 volatile byte pulseCount;
 
@@ -28,8 +26,8 @@ void setup() {
   // Initialize a serial connection for reporting values to the host
   Serial.begin(9600);
 
-  pinMode(sensorPin, INPUT);
-  digitalWrite(sensorPin, HIGH);
+  pinMode(rainGaugePin, INPUT);
+  digitalWrite(rainGaugePin, HIGH);
 
   pulseCount = 0;
   flowRate = 0.0;
@@ -40,7 +38,7 @@ void setup() {
   // The Hall-effect sensor is connected to pin 2 which uses interrupt 0.
   // Configured to trigger on a FALLING state change (transition from HIGH
   // state to LOW state)
-  attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
+  attachInterrupt(rainGaugePin, pulseCounter, FALLING);
 }
 
 /**
@@ -52,7 +50,7 @@ void loop() {
   {
     // Disable the interrupt while calculating flow rate and sending the value to
     // the host
-    detachInterrupt(sensorInterrupt);
+    detachInterrupt(rainGaugePin);
 
     // Because this loop may not complete in exactly 1 second intervals we calculate
     // the number of milliseconds that have passed since the last execution and use
@@ -75,8 +73,6 @@ void loop() {
     // Add the millilitres passed in this second to the cumulative total
     totalMilliLitres += flowMilliLitres;
 
-    unsigned int frac;
-
     // Print the flow rate for this second in litres / minute
     Serial.print("Flow rate: ");
     Serial.print(int(flowRate));  // Print the integer part of the variable
@@ -92,14 +88,15 @@ void loop() {
     pulseCount = 0;
 
     // Enable the interrupt again now that we've finished sending output
-    attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
+    attachInterrupt(digitalPinToInterrupt(rainGaugePin), pulseCounter, FALLING);
+    
   }
 }
 
 /*
 Interrupt Service Routine
  */
-void pulseCounter() {
+ICACHE_RAM_ATTR void pulseCounter() {
   // Increment the pulse counter
   pulseCount++;
 }
