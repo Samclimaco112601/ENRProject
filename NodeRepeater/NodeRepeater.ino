@@ -61,13 +61,6 @@ void setup() {
   pinMode(rainGaugePin, INPUT);
   digitalWrite(rainGaugePin, HIGH);
 
-  pulseCount = 0;
-  flowRate = 5.0;
-  flowMilliLitres = 0;
-  totalMilliLitres = 0;
-  lastRainRateTime = 0;
-  lastSentMovementTime = 0;
-
   // Configured to trigger on a FALLING state change
   attachInterrupt(rainGaugePin, pulseCounter, FALLING);
 }
@@ -104,6 +97,17 @@ void loop() {
     send(rainRateMSG.set(flowRate, 1));
     send(rainMSG.set(float(totalMilliLitres), 0));
 
+    // Print the flow rate for this second in litres / minute
+    Serial.print("Flow rate: ");
+    Serial.print(int(flowRate));  // Print the integer part of the variable
+    Serial.print("L/min");
+    Serial.print("\t");  // Print tab space
+
+    // Print the cumulative total of litres flowed since starting
+    Serial.print("Output Liquid Quantity: ");
+    Serial.print(totalMilliLitres);
+    Serial.println("mL");
+
     // Reset the pulse counter so we can start incrementing again
     pulseCount = 0;
 
@@ -111,16 +115,16 @@ void loop() {
     attachInterrupt(digitalPinToInterrupt(rainGaugePin), pulseCounter, FALLING);
   }
 
-  // if a day has past
-  if (millis() - lastDay > 86400000) { 
-    flowMilliLitres = 0; //reset rain total
+  // If a day has past
+  if (abs(millis() - lastDay) > 86400000) {
+    flowMilliLitres = 0;  //reset rain total
   }
 
   // Get Gyroscope values
   sensors_event_t accel, gyro, temp;
   mpu.getEvent(&accel, &gyro, &temp);
 
-  /* Landlslide detection based on rotation*/
+  // Pythagorean theorem to get total rotation in rad/s
   float totalRotation = sqrt(gyro.gyro.x * gyro.gyro.x + gyro.gyro.y * gyro.gyro.y + gyro.gyro.z * gyro.gyro.z);
 
   // If movement has been detected
