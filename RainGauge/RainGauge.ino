@@ -26,6 +26,7 @@ void setup() {
   // Initialize a serial connection for reporting values to the host
   Serial.begin(9600);
 
+  Serial.print("here");
   pinMode(rainGaugePin, INPUT);
   digitalWrite(rainGaugePin, HIGH);
 
