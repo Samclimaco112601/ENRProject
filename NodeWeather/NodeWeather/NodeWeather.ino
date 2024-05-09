@@ -6,6 +6,10 @@
 // Use a bit lower baudrate for serial prints on ESP8266 than default in MyConfig.h
 #define MY_BAUD_RATE 9600
 
+#define MY_NODE_ID 48
+#define MY_PARENT_NODE_ID 0
+#define MY_PARENT_NODE_IS_STATIC
+
 // Enables and select radio type (if attached)
 #define MY_RADIO_RF24
 #define MY_RF24_CE_PIN 2 // D4 pin
