@@ -105,12 +105,12 @@ void setup() {
   // Setup for the air particle sensor
   while (!aqi.begin_I2C()) {  // connect to the sensor over I2C
     Serial.println("Could not find PM 2.5 sensor!");
-    delay(1000);
+    wait(1000);
   }
   // Setup for the BME280 sensor
   while (!bme.begin()) {
     Serial.println("Could not find a valid BME680 sensor, check wiring!");
-    delay(1000);
+    wait(1000);
   }
 
   // Set up oversampling and filter initialization
@@ -146,13 +146,13 @@ void loop() {
   // check connection to the sensor over I2C
   if (!aqi.begin_I2C()) {  
     Serial.println("Could not find PM 2.5 sensor!");
-    delay(1000);
+    wait(1000);
     return;
   }
 
   if (!bme.begin()) {
     Serial.println("Could not find a valid BME680 sensor, check wiring!");
-    delay(1000);
+    wait(1000);
     return;
   }
 
