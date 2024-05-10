@@ -12,7 +12,7 @@
 
 // Enables and select radio type (if attached)
 #define MY_RADIO_RF24
-#define MY_RF24_CE_PIN 2 // D4 pin
+#define MY_RF24_CE_PIN 2  // GPIO2 = D4 pin
 
 // Set LOW transmit power level as default, if you have an amplified NRF-module and
 // power your radio separately with a good regulator you can turn up PA level.
@@ -69,12 +69,16 @@ MyMessage msgDust100b(CHILD_ID_DUST_PM100, V_UNIT_PREFIX);
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  if (!bme.begin()) {
+
+  // Setup for the air particle sensor
+  while (!aqi.begin_I2C()) {  // connect to the sensor over I2C
+    Serial.println("Could not find PM 2.5 sensor!");
+    delay(1000);
+  }
+
+  while (!bme.begin()) {
     Serial.println("Could not find a valid BME680 sensor, check wiring!");
-    while (1)
-      ;
-  } else {
-    Serial.print("BME found");
+    delay(1000);
   }
 
   // Set up oversampling and filter initialization
@@ -83,17 +87,8 @@ void setup() {
   bme.setPressureOversampling(BME680_OS_4X);
   bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
   bme.setGasHeater(320, 150);  // 320*C for 150 ms
-
-  // Setup for the air particle sensor
-  if (!aqi.begin_I2C()) {  // connect to the sensor over I2C
-    Serial.println("Could not find PM 2.5 sensor!");
-    delay(1000);
-    while (1)
-      ;
-  } else {
-    Serial.print("PM25 found");
-  }
 }
+
 
 void presentation() {
   sendSketchInfo("Aerosol and Weather Sensor Combined", "2.3.2");
@@ -118,6 +113,14 @@ void presentation() {
 
 void loop() {
   // BME680
+  if (!bme.begin()) {
+    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+  }
+
+  if (!aqi.begin_I2C()) {  // connect to the sensor over I2C
+    Serial.println("Could not find PM 2.5 sensor!");
+  }
+
   bme.performReading();
 
   Serial.print("Temperature = ");
