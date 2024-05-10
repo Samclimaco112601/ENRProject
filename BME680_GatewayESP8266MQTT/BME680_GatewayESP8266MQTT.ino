@@ -102,6 +102,12 @@ void setup() {
   Wire.begin();
   Serial.begin(9600);
 
+  // Setup for the air particle sensor
+  while (!aqi.begin_I2C()) {  // connect to the sensor over I2C
+    Serial.println("Could not find PM 2.5 sensor!");
+    delay(1000);
+  }
+  // Setup for the BME280 sensor
   while (!bme.begin()) {
     Serial.println("Could not find a valid BME680 sensor, check wiring!");
     delay(1000);
@@ -113,12 +119,6 @@ void setup() {
   bme.setPressureOversampling(BME680_OS_4X);
   bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
   bme.setGasHeater(320, 150);  // 320*C for 150 ms
-
-  // Setup for the air particle sensor
-  while (!aqi.begin_I2C()) {  // connect to the sensor over I2C
-    Serial.println("Could not find PM 2.5 sensor!");
-    delay(1000);
-  }
 }
 
 void presentation() {
@@ -143,14 +143,17 @@ void presentation() {
 
 
 void loop() {
+  // check connection to the sensor over I2C
+  if (!aqi.begin_I2C()) {  
+    Serial.println("Could not find PM 2.5 sensor!");
+    delay(1000);
+    return;
+  }
 
   if (!bme.begin()) {
     Serial.println("Could not find a valid BME680 sensor, check wiring!");
-  }
-
-  if (!aqi.begin_I2C()) {  // connect to the sensor over I2C
-    Serial.println("Could not find PM 2.5 sensor!");
     delay(1000);
+    return;
   }
 
   // BME680

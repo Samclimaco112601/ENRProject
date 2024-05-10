@@ -76,6 +76,7 @@ void setup() {
     delay(1000);
   }
 
+  // Setup for the BME280 sensor
   while (!bme.begin()) {
     Serial.println("Could not find a valid BME680 sensor, check wiring!");
     delay(1000);
@@ -112,13 +113,17 @@ void presentation() {
 
 
 void loop() {
-  // BME680
-  if (!bme.begin()) {
-    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+  // check connection to the sensor over I2C
+  if (!aqi.begin_I2C()) {  
+    Serial.println("Could not find PM 2.5 sensor!");
+    delay(1000);
+    return;
   }
 
-  if (!aqi.begin_I2C()) {  // connect to the sensor over I2C
-    Serial.println("Could not find PM 2.5 sensor!");
+  if (!bme.begin()) {
+    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+    delay(1000);
+    return;
   }
 
   bme.performReading();
