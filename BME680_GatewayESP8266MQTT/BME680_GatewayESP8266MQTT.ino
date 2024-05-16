@@ -49,6 +49,7 @@
 // MQTT broker if using URL instead of ip address.
 // #define MY_CONTROLLER_URL_ADDRESS "ecuador.mynetgear.com"
 #define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
+// #define MY_CONTROLLER_URL_ADDRESS "john3651.ddn.net"
 
 // The MQTT broker port to to open
 #define MY_PORT 1883

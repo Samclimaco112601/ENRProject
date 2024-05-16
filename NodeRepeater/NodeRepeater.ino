@@ -107,7 +107,7 @@ void loop() {
     Serial.print("Output Liquid Quantity: ");
     Serial.print(totalMilliLitres);
     Serial.println("mL");
-
+  
     // Reset the pulse counter so we can start incrementing again
     pulseCount = 0;
 
