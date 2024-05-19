@@ -1,4 +1,4 @@
-//Code for the ESP8266, includes BME680 sensor and PM2.5 Air sensor
+//Code for the Gateway ESP8266, includes BME680 sensor and PM2.5 Air sensor
 
 // Enable debug prints to serial monitor
 #define MY_DEBUG
@@ -10,7 +10,6 @@
 #define MY_RADIO_RF24
 #define MY_RF24_CE_PIN 2  // GPIO2 = D4 on ESP8266
 
-
 #define MY_GATEWAY_MQTT_CLIENT
 #define MY_GATEWAY_ESP8266
 
@@ -21,14 +20,9 @@
 // Set MQTT client id
 #define MY_MQTT_CLIENT_ID "mysensors-3"
 
-// Enable these if your MQTT broker requires username/password
-//#define MY_MQTT_USER "username"
-//#define MY_MQTT_PASSWORD "password"
-
 // Set WIFI SSID and password
 //#define MY_WIFI_SSID "SPEEDY CASA 1"
 //#define MY_WIFI_PASSWORD "aguilaincaecuador"
-
 #define MY_WIFI_SSID "NETGEAR13"
 #define MY_WIFI_PASSWORD "smilingcoconut656"
 
@@ -36,17 +30,7 @@
 // passed to the DHCP server if not static.
 #define MY_HOSTNAME "ESP8266_MQTT_GW"
 
-// Enable MY_IP_ADDRESS here if you want a static ip address (no DHCP)
-//#define MY_IP_ADDRESS 192,168,178,87
-
-// If using static ip you can define Gateway and Subnet address as well
-// #define MY_IP_GATEWAY_ADDRESS 192,168,178,1
-// #define MY_IP_SUBNET_ADDRESS 255,255,255,0
-
-// MQTT broker ip address.
-// #define MY_CONTROLLER_IP_ADDRESS 192, 168, 1, 2
-
-// MQTT broker if using URL instead of ip address.
+// MQTT broker if using URL
 // #define MY_CONTROLLER_URL_ADDRESS "ecuador.mynetgear.com"
 #define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
 // #define MY_CONTROLLER_URL_ADDRESS "john3651.ddn.net"
@@ -97,7 +81,6 @@ MyMessage msgDust50(CHILD_ID_DUST_PM50, V_LEVEL);
 MyMessage msgDust50b(CHILD_ID_DUST_PM50, V_UNIT_PREFIX);
 MyMessage msgDust100(CHILD_ID_DUST_PM100, V_LEVEL);
 MyMessage msgDust100b(CHILD_ID_DUST_PM100, V_UNIT_PREFIX);
-
 
 void setup() {
   Wire.begin();
