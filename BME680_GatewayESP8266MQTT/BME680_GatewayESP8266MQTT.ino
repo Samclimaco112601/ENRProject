@@ -10,15 +10,19 @@
 #define MY_RADIO_RF24
 #define MY_RF24_CE_PIN 2  // GPIO2 = D4 on ESP8266
 
+// Set LOW transmit power level as default, if you have an amplified NRF-module and
+// power your radio separately with a good regulator you can turn up PA level.
+#define MY_RF24_PA_LEVEL RF24_PA_HIGH
+
 #define MY_GATEWAY_MQTT_CLIENT
 #define MY_GATEWAY_ESP8266
 
 // Set this node's subscribe and publish topic prefix
-#define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway3-out"
-#define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "mygateway3-in"
+#define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway5-out"
+#define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "mygateway5-in"
 
 // Set MQTT client id
-#define MY_MQTT_CLIENT_ID "mysensors-3"
+#define MY_MQTT_CLIENT_ID "mysensors-5"
 
 // Set WIFI SSID and password
 //#define MY_WIFI_SSID "SPEEDY CASA 1"
@@ -32,8 +36,8 @@
 
 // MQTT broker if using URL
 // #define MY_CONTROLLER_URL_ADDRESS "ecuador.mynetgear.com"
-#define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
-// #define MY_CONTROLLER_URL_ADDRESS "john3651.ddn.net"
+// #define MY_CONTROLLER_URL_ADDRESS "wint0178.mynetgear.com"
+#define MY_CONTROLLER_URL_ADDRESS "john3651.ddns.net"
 
 // The MQTT broker port to to open
 #define MY_PORT 1883
